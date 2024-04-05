@@ -116,6 +116,16 @@ provider "azurerm" {
 # RESOURCES
 #############################################################################
 
+# random_name resource  
+
+resource "random_string" "random_name" {
+  length  = 2
+  special = false
+  upper   = false
+  lower   = true
+  numeric  = true
+}
+
 ## Resource Group ##
 
 resource "azurerm_resource_group" "innovation" {
@@ -126,14 +136,14 @@ resource "azurerm_resource_group" "innovation" {
 ## AZURE AD USER ##
 
 resource "azuread_user" "user1" {
-  user_principal_name         = "${var.user_name1}@${var.domain}"
+  user_principal_name         = "${var.user_name1}@${var.}"
   display_name                = var.user_name1
   password                    = var.user_password1
   disable_password_expiration = true
 }
 
 resource "azuread_user" "user2" {
-  user_principal_name         = "${var.user_name2}@${var.domain}"
+  user_principal_name         = "${var.user_name2}@${var.}"
   display_name                = var.user_name2
   password                    = var.user_password2
   disable_password_expiration = true
@@ -141,7 +151,7 @@ resource "azuread_user" "user2" {
 }
 
 resource "azuread_user" "user3" {
-  user_principal_name         = "${var.user_name3}@${var.domain}"
+  user_principal_name         = "${var.user_name3}@${var.}"
   display_name                = var.user_name3
   password                    = var.user_password3
   disable_password_expiration = true
@@ -159,7 +169,7 @@ resource "azuread_service_principal" "InnovationAppSPN" {
 
 ## Key Vault ##
 resource "azurerm_key_vault" "InnovationDeptKeyVault" {
-  name                        = var.key_vault_name
+  name                        = "${var.key_vault_name}${random_string.random_name.result}"
   location                    = azurerm_resource_group.innovation.location
   resource_group_name         = azurerm_resource_group.innovation.name
   enabled_for_disk_encryption = true
@@ -225,17 +235,17 @@ resource "azurerm_automation_credential" "sqladmin" {
   name                    = "sqladmin"
   resource_group_name     = azurerm_resource_group.innovation.name
   automation_account_name = azurerm_automation_account.InnovationAutomationAccount.name
-  username                = "${var.user_name3}@${var.domain}"
+  username                = "${var.user_name3}@${var.}"
   password                = "${var.user_password3}"
 }
 
 ## SQL DB ##
 resource "azurerm_mssql_server" "AzureSQLServer" {
-  name                         = var.sql_server_name
+  name                         = "${var.sql_server_name}${random_string.random_name.result}"
   resource_group_name          = azurerm_resource_group.innovation.name
   location                     = "East US"
   version                      = "12.0"
-  administrator_login          = "${var.user_name3}@${var.domain}"
+  administrator_login          = "${var.user_name3}@${var.}"
   administrator_login_password = "${var.user_password3}"
 
   azuread_administrator {
@@ -332,7 +342,7 @@ resource "azuread_conditional_access_policy" "Linux" {
 
 ## Output
 output "username" {
-  value = "${var.user_name1}@${var.domain}"
+  value = "${var.user_name1}@${var.}"
 }
 output "password" {
   value = var.user_password1
