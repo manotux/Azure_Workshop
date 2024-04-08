@@ -105,6 +105,16 @@ provider "azuread" {
 # RESOURCES
 #############################################################################
 
+# random_name resource  
+
+resource "random_string" "random_name" {
+  length  = 4
+  special = false
+  upper   = false
+  lower   = true
+  numeric  = true
+}
+
 ## Resource Group ##
 
 resource "azurerm_resource_group" "innovation" {
@@ -123,7 +133,7 @@ resource "azuread_user" "user1" {
 
 ## AZURE STORAGE ACCOUNT ##
 resource "azurerm_storage_account" "storage" {
-  name                     = var.storage_account_name
+  name                     = "${var.storage_account_name}${random_string.random_name.result}"
   resource_group_name      = azurerm_resource_group.innovation.name
   location                 = azurerm_resource_group.innovation.location
   account_tier             = "Standard"
@@ -278,7 +288,7 @@ resource "azurerm_windows_virtual_machine" "WindowsVM" {
   source_image_reference {
     publisher = "MicrosoftWindowsDesktop"
     offer     = "Windows-10"
-    sku       = "21h1-pro"
+    sku       = "win10-22h2-pro"
     version   = "latest"
   }
 
