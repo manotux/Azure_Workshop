@@ -253,7 +253,7 @@ resource "azurerm_virtual_machine_extension" "CommandLinux" {
 
   settings = <<SETTINGS
     {
-      "commandToExecute": "sudo apt-get update && sudo apt-get upgrade && curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+      "commandToExecute": "sudo apt-get update && sudo apt-get -y upgrade && curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
     }
   SETTINGS
 }
